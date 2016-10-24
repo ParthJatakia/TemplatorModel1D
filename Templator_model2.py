@@ -2,25 +2,26 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-r = 0.775
+r = 0.775#0.775
 ku = 0.015874
-Dv = 6.29961
-Du = 31.498
+Dv = 0.03
+Du = 0.15
 K = 0.15874
 
-size = 128  # size of the 2D grid
+size = 64  # size of the 1D grid
 dx = 2. / size  # space step
+l=size/3.0
 T = 1.0  # total time
-dt = dx**2/2  # time step
-n = 300
+dt = 0.001 #dx**2/100  # time step
+n = 5000000
 
-U = [2]*size
+U = [1]*size
 V = [None]*0
 for i in range(size):
-    if i > 40 and i < 85:
-        V.append(np.sin(i)+1)
+    if i > (size - l) / 2 and i < (size + l) / 2:
+        V.append(np.sin(5 * np.pi * (i - (size - l) / 2) / l) ** 2)
     else:
-        V.append(0)
+        V.append(0.0)
 Ut = U
 
 Vt = V
@@ -40,18 +41,13 @@ for i in range(n):
     # We compute the Laplacian of u and v.
     deltaU = laplacian(U)
     deltaV = laplacian(V)
-    print "reached %i" %i
     # We take the values of u and v inside the grid.
     Uc = U[1:-1]
     Vc = V[1:-1]
     # We update the variables.
-    print len(U)
-    print len(V)
     U[1:-1], V[1:-1] = \
-        Uc + dt * (r - ku*np.square(Uc) -np.multiply(np.square(Uc),Vc)+ Du*deltaU), \
+        Uc + dt * (r - ku*np.square(Uc) - np.multiply(np.square(Uc),Vc)+ Du*deltaU), \
         Vc + dt * (ku*np.square(Uc)+ np.multiply(np.square(Uc), Vc) -np.divide(Vc, np.add(K,Vc))+Dv*deltaV)
-    print len(U)
-    print len(V)
     Ut = np.vstack((U,Ut))
     Vt = np.vstack((Vt, V))
 
